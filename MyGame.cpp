@@ -35,6 +35,11 @@ SoundBuffer bfOver;
 Sound SOver;
 SoundBuffer bfCutscene;
 Sound sCutscene;
+SoundBuffer collisionBuffer;
+Sound collisionSound;
+
+
+
 int y = 0;
 bool cutScene = 0;
 
@@ -90,7 +95,7 @@ struct Drop {
     Sprite sDropshape;
     RectangleShape dropCollider, targetCollider;
     int type;
-   
+
 };
 
 struct Bullet {
@@ -174,7 +179,7 @@ public:
     }
 
     void move(float deltaTime) {
-        
+
         moving = false;
         shooting = 0;
         // Horizontal movement
@@ -194,7 +199,7 @@ public:
 
 
         }
-        
+
 
 
 
@@ -240,7 +245,7 @@ public:
         playerRealcollider.setPosition(Ninja.getPosition().x + 45, Ninja.getPosition().y + 60);
         playerRealcollider.setOrigin(Ninja.getOrigin());
 
-        playerProtection.setPosition(Ninja.getPosition().x + 25 , Ninja.getPosition().y + 60);
+        playerProtection.setPosition(Ninja.getPosition().x + 25, Ninja.getPosition().y + 60);
         playerProtection.setOrigin(Ninja.getOrigin());
     }
 
@@ -297,7 +302,7 @@ void SetDrops();
 void ChooseDrop(RectangleShape blocks_real_collider[], Clock& Addtimer, Clock& DeleteTimer);
 void DropADrop(float dt, Player& player);
 void bulletCooldown(Player& player);
-void Bulletmovement(vector<Bullet> &bullets);
+void Bulletmovement(vector<Bullet>& bullets);
 void LeaderBoard();
 void Cutscene(Player& player, Sprite blocks[], Enemy enemies[]);
 void BackGroundEnemies(Player& player);
@@ -306,6 +311,9 @@ void LevelTwo(Player& player, Sprite Sprites[]);
 
 
 int main() {
+
+    this_pausemenu.playPauseMenuMusic(); 
+
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -314,6 +322,7 @@ int main() {
                 window.close();
             }
             if (event.type == Event::KeyPressed) {
+
                 if (event.key.code == Keyboard::Up) {
                     this_mainmenu.move_up();
                 }
@@ -325,7 +334,7 @@ int main() {
                         Pname();
                     }
                     if (this_mainmenu.pressed() == 1) {
-                        
+
                     }
                     if (this_mainmenu.pressed() == 2) {
                         window.close();
@@ -346,7 +355,6 @@ int main() {
 
 
 void Pname() {
-    
 
     if (!PlayerName.empty()) {
         PlayerName.clear();
@@ -354,8 +362,8 @@ void Pname() {
 
     Font player_name_font;
     Font system_font;
-    player_name_font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
-    system_font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+    player_name_font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
+    system_font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
     Text t1, t2;
     t1.setString("Enter your name");
     t1.setFont(system_font), t2.setFont(player_name_font);
@@ -408,7 +416,7 @@ void GamePlay() {
 
     Clock clock;
 
-    
+
 
     Player player;
 
@@ -418,7 +426,10 @@ void GamePlay() {
     gows.setBuffer(gow);
     bfOver.loadFromFile("Chosen/Sound/DeathMenu/Wardruna - Einar Selvik - Snake Pit Poetry  [FULL EP](MP3_320K)-[AudioTrimmer.com]-[AudioTrimmer.com].mp3");
     SOver.setBuffer(bfOver);
+    this_pausemenu.stopPauseMenuMusic();
     gows.play();
+
+
 
     // loading enemy tex
 
@@ -507,10 +518,11 @@ void GamePlay() {
             if (e.type == Event::KeyPressed) {
                 if (e.key.code == Keyboard::Escape) {
                     gows.pause();
+                    this_pausemenu.playPauseMenuMusic();
                     pauseMenu();
                 }
             }
-            
+
         }
         //if (Mouse::isButtonPressed(Mouse::Right)) {
         //    Vector2i mousePos = Mouse::getPosition(window);
@@ -525,7 +537,7 @@ void GamePlay() {
             player.bulletIndex--;
             player.bulletShooting = 0;
 
-        }        
+        }
 
 
         bulletCooldown(player);
@@ -545,15 +557,19 @@ void GamePlay() {
                     int y = rand() % (921) + 80;
                     enemies[i].sEnemy.setPosition(-200, y);
                     enemies[i].speed = rand() % (8) + 8;
+
                 }
                 // enemy hit player
-                
+
                 if (!player.Protected) {
                     if (player.playerRealcollider.getGlobalBounds().intersects(enemies[i].enemyRealcollider.getGlobalBounds())) {
                         int y = rand() % (921) + 80;
                         enemies[i].sEnemy.setPosition(0, y);
                         enemies[i].speed = rand() % (8) + 8;
                         player.health--;
+                        collisionBuffer.loadFromFile("Chosen/Sound/collision.wav");
+                        collisionSound.setBuffer(collisionBuffer);
+                        collisionSound.play(); //play collision sound
                     }
                 }
 
@@ -585,7 +601,7 @@ void GamePlay() {
                         enemies[i].sEnemy.setPosition(1900, y);
                         enemies[i].speed = rand() % (8) + 8;
                         player.health--;
-                }
+                    }
 
                 }
                 // player shoot enemy
@@ -604,8 +620,8 @@ void GamePlay() {
             enemies[i].enemyRealcollider.setPosition(enemies[i].sEnemy.getPosition());
 
         }
-        
-        
+
+
 
         // handle collision between player & blocks
 
@@ -634,7 +650,7 @@ void GamePlay() {
                             player.onground = 1;
                             player.verticalVelocity -= player.gravity * deltaTime;
                             player.playerProtection.setPosition(player.Ninja.getPosition().x + 25, player.Ninja.getPosition().y + 60);
-                            
+
 
                         }
                     }
@@ -685,39 +701,38 @@ void GamePlay() {
 
 
 
-        
+
         updateStatus(player);
-        
+
 
         if (player.health <= 0) {
 
-            
+
 
             ofstream offile;
             offile.open("LeaderBoard.txt", ios::app);
             if (player.score > highestScore) {
                 highestScore = player.score;
                 offile << PlayerName << "          " << player.score << '*' << endl;
-                
-            }
-            
 
-           gows.stop();
-           SOver.play();
-           
-           this_thread::sleep_for(chrono::milliseconds(2900));
-            
+            }
+
+
+            gows.stop();
+            SOver.play();
+
+            this_thread::sleep_for(chrono::milliseconds(2900));
+
             GameOver();
         }
 
-
-        if (player.score >= 5) {
+        if (player.health <= 2) {
             bfCutscene.loadFromFile("Chosen/Sound/Cutscene/[LIVE] God of War (2023) - Hollywood Bowl(MP3_320K)-[AudioTrimmer.com].mp3");
             sCutscene.setBuffer(bfCutscene);
             sCutscene.play();
             Cutscene(player, blocks, enemies);
         }
-        
+
 
         window.clear();
         window.draw(sback);
@@ -737,10 +752,10 @@ void GamePlay() {
 
         }
         for (int i = 0; i < player.bullets.size(); i++) {
-           window.draw(player.bullets[i].bulletCircle);
+            window.draw(player.bullets[i].bulletCircle);
         }
         if (player.Protected) window.draw(player.playerProtection);
-        
+
         //window.draw(player.playerRealcollider);
         window.draw(player.Ninja);
         displayStatus();
@@ -753,15 +768,15 @@ void GamePlay() {
 void setStatus(Player& player) {
     //health
 
-    playerFont.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+    playerFont.loadFromFile("Chosen/font/Playername font/More Punk Than You.ttf");
 
     playerHealthText.setFont(playerFont);
 
     String playerHealthString = to_string(player.health);
     playerHealthText.setString("Health : " + playerHealthString);
 
-    playerHealthText.setCharacterSize(40);
-    playerHealthText.setFillColor(Color::Green);
+    playerHealthText.setCharacterSize(60);
+    playerHealthText.setFillColor(Color::Magenta);
 
     // EnemiesKilled
 
@@ -769,7 +784,7 @@ void setStatus(Player& player) {
 
     String EkilledString = to_string(player.enemiesKilled);
     EkilledText.setString("Enemies killed : " + EkilledString);
-    EkilledText.setCharacterSize(40);
+    EkilledText.setCharacterSize(60);
     EkilledText.setPosition(0, 75);
     EkilledText.setFillColor(Color::White);
 
@@ -781,10 +796,10 @@ void setStatus(Player& player) {
 
     ScoreText.setPosition(0, 150);
     ScoreText.setString("Score : " + ScoreString);
-    ScoreText.setCharacterSize(40);
+    ScoreText.setCharacterSize(60);
     ScoreText.setFillColor(Color::White);
 
-    
+
 
     ProtectionText.setFont(playerFont);
     ProtectionString = to_string(player.ProtectionCooldown);
@@ -841,7 +856,9 @@ void pauseMenu() {
             if (e.type == Event::KeyPressed) {
 
                 if (e.key.code == Keyboard::Escape) {
+                    this_pausemenu.stopPauseMenuMusic();
                     gows.play();
+
                     return;
                 }
                 if (e.key.code == Keyboard::Up) {
@@ -853,6 +870,7 @@ void pauseMenu() {
                 if (e.key.code == Keyboard::Enter) {
                     int selectedItem = this_pausemenu.pressed();
                     if (selectedItem == 0) { // Resume
+                        this_pausemenu.stopPauseMenuMusic();
                         gows.play();
                         return;
                     }
@@ -1133,7 +1151,7 @@ void DropADrop(float dt, Player& player) {
             else if (dropBag[i].type == 2) {
                 player.ProtectionCooldown = 10;
                 player.Protected = 1;
-                
+
                 dropBag.erase(dropBag.begin() + i);
             }
             else if (dropBag[i].type == 3) {
@@ -1174,14 +1192,14 @@ void bulletCooldown(Player& player) {
     }
 }
 
-void Bulletmovement(vector<Bullet> &bullets) {
+void Bulletmovement(vector<Bullet>& bullets) {
 
     for (int i = 0; i < bullets.size(); i++) {
 
-        
+
 
         if (bullets[i].move_to_right == 1) bullets[i].bulletCircle.move(bullets[i].speed, 0);
-        else if(bullets[i].move_to_right == 0) bullets[i].bulletCircle.move(-1 * bullets[i].speed, 0);
+        else if (bullets[i].move_to_right == 0) bullets[i].bulletCircle.move(-1 * bullets[i].speed, 0);
 
         //if (bullets[i].bulletCircle.getPosition().x >= 1920 || bullets[i].bulletCircle.getPosition().x <= 0) {
         //    bullets.erase(bullets.begin() + i);
@@ -1204,10 +1222,10 @@ void LeaderBoard() {
     }
 
     Font font;
-    font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+    font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
 
     vector<Text> text;
-    
+
 
     for (int i = 0; i < lines.size(); i++) {
 
@@ -1240,7 +1258,7 @@ void LeaderBoard() {
             }
         }
         window.clear();
-        
+
         for (int i = 0; i < lines.size(); i++) {
             window.draw(text[i]);
         }
@@ -1249,7 +1267,7 @@ void LeaderBoard() {
 
 }
 
-void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
+void Cutscene(Player& player, Sprite blocks[], Enemy enemies[]) {
 
     player.moving = 0;
     gows.stop();
@@ -1257,8 +1275,9 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
     // loading texures && sounds
 
 
-    Texture tex[4];
-    Sprite Sprites[4];
+    Texture tex[5];
+    Sprite Sprites[5];
+
     for (int i = 3; i <= 5; i++) {
         tex[i - 3].loadFromFile("Chosen/Backgrounds/2/" + to_string(i) + ".png");
         Sprites[i - 3].setTexture(tex[i - 3]);
@@ -1268,7 +1287,7 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
     Sprites[0].scale(0.658, 1.34);
     Sprites[0].setPosition(0, -1060);
     Sprites[1].scale(0.5, 1.14);
-    Sprites[1].setPosition(0,-1900);
+    Sprites[1].setPosition(0, -1900);
     Sprites[2].scale(0.5, 0.8787);
     Sprites[2].setPosition(0, -2990);
 
@@ -1278,13 +1297,20 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
     Sprites[3].setPosition(0, -4080);
 
 
+    tex[4].loadFromFile("Chosen/Backgrounds/backgroundLEVEL2.png");
+    Sprites[4].setTexture(tex[4]);
+    Sprites[4].setScale(0.4, 0.4);
+    Sprites[4].setPosition(0, -4280);
+
+
+
     // text
     Text levelOne;
     Font font;
-    font.loadFromFile("Chosen/font/BreatheFireIv-3zAVZ.ttf");
+    font.loadFromFile("Chosen/font/More Punk Than You.ttf");
     levelOne.setFont(font);
 
-    levelOne.setPosition(650, -550);
+    levelOne.setPosition(680, -550);
     levelOne.setCharacterSize(80);
     levelOne.setString("LEVEL 1 COMPLETED");
 
@@ -1295,7 +1321,7 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
     View PlayerCam(Vector2f(0, 0), Vector2f(window.getSize().x, window.getSize().y));
 
 
-    player.Ninja.setPosition(950, 540 );
+    player.Ninja.setPosition(950, 540);
 
     cutScene = 1;
 
@@ -1304,7 +1330,7 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
 
 
         Event e;
-        
+
         while (window.pollEvent(e)) {
             if (e.type == Event::Closed) {
                 window.close();
@@ -1318,8 +1344,8 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
                 }
 
             }
-            
-            
+
+
         }
         if (player.Ninja.getPosition().y <= -3550) {
             player.Ninja.setPosition(player.Ninja.getPosition().x, -3550);
@@ -1332,9 +1358,9 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
             PlayerCam.setCenter(player.Ninja.getPosition());
         }
         if (!Acend) {
-            
+
             if (PlayerCam.getCenter().y <= -4080)
-            PlayerCam.move(0, -5);
+                PlayerCam.move(0, -5);
             else {
                 LevelTwo(player, Sprites);
             }
@@ -1352,7 +1378,7 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
         // draw ____________________________________________________________________________________________________________________
         window.clear();
 
-        if (player.Ninja.getPosition().y >= -552 ) {
+        if (player.Ninja.getPosition().y >= -552) {
             window.draw(sback);
             for (int i = 0; i < 13; i++) {
 
@@ -1378,7 +1404,7 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
             window.draw(player.Ninja);
             //displayStatus();
         }
-        for (int i = 0; i <= 3; i++) {
+        for (int i = 0; i <= 4; i++) {
             window.draw(Sprites[i]);
         }
         window.draw(levelOne);
@@ -1390,18 +1416,18 @@ void Cutscene(Player& player,Sprite blocks[], Enemy enemies[]) {
 
 }
 
-void BackGroundEnemies(Player &player) {
+void BackGroundEnemies(Player& player) {
 
     Enemy Enemies[12];
 
-    
+
 
     Texture tbackgroundEnemy[3];
     for (int i = 0; i < 3; i++) {
         tbackgroundEnemy[i].loadFromFile("Chosen/enemies/PNG/demon/Idle" + to_string(i + 1) + ".png");
 
     }
-    
+
     int left_x = -20, right_x = 1900;
     int start_y = -3200;
 
@@ -1426,7 +1452,7 @@ void BackGroundEnemies(Player &player) {
 
         window.draw(Enemies[i].sEnemy);
     }
-    
+
 }
 
 
@@ -1448,7 +1474,7 @@ void LevelTwo(Player& player, Sprite Sprites[]) {
             }
         }
         window.clear();
-        window.draw(Sprites[3]);
+        window.draw(Sprites[4]);
         window.draw(player.Ninja);
         BackGroundEnemies(player);
         window.display();

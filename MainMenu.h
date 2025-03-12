@@ -1,5 +1,6 @@
 #pragma once
 #include<SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include<iostream>
 using namespace std;
 using namespace sf;
@@ -32,6 +33,8 @@ private:
 	int selected = 0;
 	Text pausemenu[3];
 	Font font;
+	SoundBuffer pauseMenu_buff;
+	Sound pauseMenu_sound; 
 public:
 	PauseMenu();
 	void draw(RenderWindow& window);
@@ -41,6 +44,8 @@ public:
 	int pressed() {
 		return selected;
 	}
+	void playPauseMenuMusic();
+	void stopPauseMenuMusic();
 	~PauseMenu();
 };
 

@@ -1,11 +1,14 @@
 #include "MainMenu.h"
 #include<SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include<vector>
 using namespace std;
 using namespace sf;
 
-MainMenu::MainMenu() {
-	font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+
+
+	MainMenu::MainMenu() {
+	font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
 
 	float text_y_position = 300;
 	float text_x_position = 500;
@@ -78,7 +81,7 @@ PauseMenu::PauseMenu() {
 
 
 
-	font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+	font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
 
 
 
@@ -105,8 +108,22 @@ PauseMenu::PauseMenu() {
 
 	selected = 0;
 
+
+
 }
 PauseMenu::~PauseMenu() {}
+
+void PauseMenu::playPauseMenuMusic () {
+	pauseMenu_buff.loadFromFile("Chosen/Sound/08. Beginning.wav");
+	pauseMenu_sound.setBuffer(pauseMenu_buff);
+	pauseMenu_sound.play();
+	pauseMenu_sound.setLoop(true);
+}
+
+void PauseMenu::stopPauseMenuMusic()
+{
+	pauseMenu_sound.stop();
+}
 
 void PauseMenu::draw(RenderWindow& window) {
 	RectangleShape rectangle(Vector2f(450, 600));
@@ -117,6 +134,7 @@ void PauseMenu::draw(RenderWindow& window) {
 	for (int i = 0; i < 3; i++) {
 		window.draw(pausemenu[i]);
 	}
+	
 }
 
 void PauseMenu::move_up() {
@@ -171,7 +189,7 @@ GameOverMenu::GameOverMenu() {
 
 	
 	
-	font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+	font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
 
 	dead.setFont(font);
 	dead.setFillColor(Color::Red);
@@ -259,7 +277,7 @@ void GameOverMenu::set_selected(int n) {
 
 
 
-	font.loadFromFile("Chosen/font/Playername font/ArtisanParis-Regular.otf");
+	font.loadFromFile("Chosen/font/Playername font/chinese rocks rg.otf");
 
 	dead.setFont(font);
 	dead.setFillColor(Color::Red);
