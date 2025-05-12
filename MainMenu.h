@@ -5,9 +5,9 @@ using namespace std;
 using namespace sf;
 
 class MainMenu {
-private:
+public:
 	int selected;
-	Text mainmenu[3];
+	Text mainmenu[4];
 	Font font;
 
 
@@ -32,9 +32,11 @@ private:
 	int selected = 0;
 	Text pausemenu[3];
 	Font font;
+
 public:
+
 	PauseMenu();
-	void draw(RenderWindow& window);
+	void draw(RenderWindow& window, bool IsLevelTwo);
 	void set_selected(int n);
 	void move_up();
 	void move_down();
@@ -48,17 +50,15 @@ class GameOverMenu {
 private:
 	int selected = 0;
 	Text gameovermenu[5];
-	Text dead;
+	Text deadText;
 	Font font;
 	
 public:
-	GameOverMenu();
-	void draw(RenderWindow& window);
-	void set_selected(int n);
+	void SetGameOverMenu();
+	void draw(RenderWindow& window, bool IsLevelTwo);
 	void move_up();
 	void move_down();
 	int pressed() {
 		return selected;
 	}
-	~GameOverMenu();
 };
